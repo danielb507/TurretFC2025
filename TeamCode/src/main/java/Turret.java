@@ -27,13 +27,16 @@ public class Turret extends Subsystem {
 
         public String name = "motor";
 
-        public Command run ( double clicks){
+        public Command run ( double degrees){
+            double clicksDegreeProportion = 1440.0/360.0;
+            double clicks = clicksDegreeProportion * degrees;
             telemetry.addData("clicks: ", clicks);
             return new RunToPosition(motor, // MOTOR TO MOVE
                     motor.getCurrentPosition() + clicks, // TARGET POSITION, IN TICKS
                     controller, // CONTROLLER TO IMPLEMENT
                     this); // IMPLEMENTED SUBSYSTEM
         }
+
 
         @Override
         public void initialize () {

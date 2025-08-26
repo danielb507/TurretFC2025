@@ -31,11 +31,12 @@ public class PIDTest extends NextFTCOpMode {
 
 
 
-    public Command firstRoutine(double clicks) {
+    public Command firstRoutine(double degrees) {
         return new SequentialGroup(
-                Turret.INSTANCE.run(clicks)
+                Turret.INSTANCE.run(degrees)
         );
     }
+
 
 
 
@@ -53,7 +54,7 @@ public class PIDTest extends NextFTCOpMode {
             double ty = result.getTy(); // How far up or down the target is (degrees)
             double ta = result.getTa(); // How big the target looks (0%-100% of the image)
 
-            firstRoutine(tx).invoke();
+            firstRoutine(100).invoke();
             telemetry.addData("Target X", tx);
             telemetry.addData("Target Y", ty);
             telemetry.addData("Target Area", ta);
