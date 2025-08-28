@@ -1,5 +1,6 @@
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.rowanmcalpin.nextftc.core.command.groups.ParallelGroup;
+import com.rowanmcalpin.nextftc.core.command.groups.ParallelRaceGroup;
 import com.rowanmcalpin.nextftc.core.command.groups.SequentialGroup;
 import com.rowanmcalpin.nextftc.core.command.utility.LambdaCommand;
 import com.rowanmcalpin.nextftc.core.command.utility.delays.Delay;
@@ -17,6 +18,8 @@ import com.qualcomm.hardware.limelightvision.Limelight3A;
 public class PIDTest extends NextFTCOpMode {
     Limelight3A limelight;
 
+    double motorTargetX = 0.0;
+    double motorTargetY = 0.0;
     @Override
     public void onInit() {
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
@@ -31,30 +34,24 @@ public class PIDTest extends NextFTCOpMode {
 
 
 
-    public Command firstRoutine(double degrees) {
-        return new SequentialGroup(
-                Turret.INSTANCE.run(degrees)
+    public Command firstRoutine(double degreesX, double degreesY) {
+        return new ParallelGroup(
+                Turret.INSTANCE.runXLinear(degreesX),
+                Turret.INSTANCE.runYLinear(degreesY)
         );
     }
 
 
-
-
-    @Override
-    public void onStartButtonPressed() {
-
-    }
-
     @Override
     public void onUpdate() {
-        super.onUpdate();
         LLResult result = limelight.getLatestResult();
         if (result != null && result.isValid()) {
             double tx = result.getTx(); // How far left or right the target is (degrees)
             double ty = result.getTy(); // How far up or down the target is (degrees)
             double ta = result.getTa(); // How big the target looks (0%-100% of the image)
 
-            firstRoutine(100).invoke();
+            motorTargetX = tx;
+            motorTargetY = ty;
             telemetry.addData("Target X", tx);
             telemetry.addData("Target Y", ty);
             telemetry.addData("Target Area", ta);
@@ -62,7 +59,7 @@ public class PIDTest extends NextFTCOpMode {
             telemetry.addData("Limelight", "No Targets");
         }
 
-        telemetry.addData("motor Position:", Turret.INSTANCE.motor.getCurrentPosition());
+        firstRoutine(motorTargetX, motorTargetY).invoke();
         telemetry.update();
     }
 }

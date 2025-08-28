@@ -3,6 +3,7 @@ import static com.rowanmcalpin.nextftc.ftc.OpModeData.telemetry;
 import com.acmerobotics.dashboard.config.Config;
 import com.rowanmcalpin.nextftc.core.Subsystem;
 import com.rowanmcalpin.nextftc.core.command.Command;
+import com.rowanmcalpin.nextftc.core.command.groups.ParallelGroup;
 import com.rowanmcalpin.nextftc.core.control.controllers.Controller;
 import com.rowanmcalpin.nextftc.core.control.controllers.PIDFController;
 import com.rowanmcalpin.nextftc.core.control.controllers.feedforward.StaticFeedforward;
@@ -17,34 +18,46 @@ public class Turret extends Subsystem {
     private Turret() { }
 
         // USER CODE
-        public MotorEx motor;
+        public MotorEx xLinear;
 
-        public static double kP = 0.05;
-        public static double kI = 0;
-        public static double kD = 0;
+        public MotorEx yLinear;
 
-        public PIDFController controller = new PIDFController(kP, kI, kD, new StaticFeedforward(0.0));
 
-        public String name = "motor";
+        public PIDFController yLinearController = new PIDFController(.007, 0, 0, new StaticFeedforward(0.0));
 
-        public Command run ( double degrees){
+        public PIDFController xLinearController = new PIDFController(.007, 0, 0, new StaticFeedforward(0.0));
+
+
+        public Command runYLinear( double degrees){
+        double clicksDegreeProportion = 1440.0/360.0;
+        double clicks = clicksDegreeProportion * degrees;
+        telemetry.addData("clicks: ", clicks);
+        return new RunToPosition(yLinear, // MOTOR TO MOVE
+                clicks, // TARGET POSITION, IN TICKS
+                yLinearController, // CONTROLLER TO IMPLEMENT
+                this); // IMPLEMENTED SUBSYSTEM
+        }
+        public Command runXLinear( double degrees){
             double clicksDegreeProportion = 1440.0/360.0;
             double clicks = clicksDegreeProportion * degrees;
             telemetry.addData("clicks: ", clicks);
-            return new RunToPosition(motor, // MOTOR TO MOVE
-                    motor.getCurrentPosition() + clicks, // TARGET POSITION, IN TICKS
-                    controller, // CONTROLLER TO IMPLEMENT
+            return new RunToPosition(xLinear, // MOTOR TO MOVE
+                    clicks, // TARGET POSITION, IN TICKS
+                    xLinearController, // CONTROLLER TO IMPLEMENT
                     this); // IMPLEMENTED SUBSYSTEM
         }
 
-
         @Override
         public void initialize () {
-            motor = new MotorEx(name);
+            xLinear = new MotorEx("xLinear");
+            yLinear = new MotorEx("yLinear");
         }
 
         @Override
         public Command getDefaultCommand () {
-            return new HoldPosition(motor, controller, this);
+            return new ParallelGroup(
+                    new HoldPosition(xLinear, xLinearController, this),
+                    new HoldPosition(yLinear, yLinearController, this)
+                    );
         }
 }
