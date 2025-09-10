@@ -1,63 +1,45 @@
-import static com.rowanmcalpin.nextftc.ftc.OpModeData.telemetry;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.rowanmcalpin.nextftc.core.Subsystem;
-import com.rowanmcalpin.nextftc.core.command.Command;
-import com.rowanmcalpin.nextftc.core.command.groups.ParallelGroup;
-import com.rowanmcalpin.nextftc.core.control.controllers.Controller;
-import com.rowanmcalpin.nextftc.core.control.controllers.PIDFController;
-import com.rowanmcalpin.nextftc.core.control.controllers.feedforward.StaticFeedforward;
-import com.rowanmcalpin.nextftc.ftc.hardware.controllables.HoldPosition;
-import com.rowanmcalpin.nextftc.ftc.hardware.controllables.MotorEx;
-import com.rowanmcalpin.nextftc.ftc.hardware.controllables.RunToPosition;
+import com.bylazar.configurables.annotations.Configurable;
+import com.bylazar.graph.GraphManager;
+import com.bylazar.telemetry.TelemetryManager;
+import com.bylazar.graph.PanelsGraph;
+import com.bylazar.telemetry.PanelsTelemetry;
 
+import dev.nextftc.control.ControlSystem;
+import dev.nextftc.core.commands.Command;
+import dev.nextftc.core.subsystems.Subsystem;
+import dev.nextftc.hardware.impl.MotorEx;
+
+@Configurable
 @Config
-public class Turret extends Subsystem {
+public class Turret implements Subsystem {
     // BOILERPLATE
+
+
+    public static double KP = .005;
+    public static double KI = 0;
+    public static double KD = 0;
     public static final Turret INSTANCE = new Turret();
     private Turret() { }
 
         // USER CODE
-        public MotorEx xLinear;
 
-        public MotorEx yLinear;
+        public MotorEx xLinear = new MotorEx("yLinear");
+        public MotorEx yLinear = new MotorEx("yLinear");
 
+        private ControlSystem yLinearControl = ControlSystem.builder()
+                .posPid(KP, KI, KD)
+                .elevatorFF(0)
+                .build();
 
-        public PIDFController yLinearController = new PIDFController(.007, 0, 0, new StaticFeedforward(0.0));
-
-        public PIDFController xLinearController = new PIDFController(.007, 0, 0, new StaticFeedforward(0.0));
-
-
-        public Command runYLinear( double degrees){
-        double clicksDegreeProportion = 1440.0/360.0;
-        double clicks = clicksDegreeProportion * degrees;
-        telemetry.addData("clicks: ", clicks);
-        return new RunToPosition(yLinear, // MOTOR TO MOVE
-                clicks, // TARGET POSITION, IN TICKS
-                yLinearController, // CONTROLLER TO IMPLEMENT
-                this); // IMPLEMENTED SUBSYSTEM
-        }
-        public Command runXLinear( double degrees){
-            double clicksDegreeProportion = 1440.0/360.0;
-            double clicks = clicksDegreeProportion * degrees;
-            telemetry.addData("clicks: ", clicks);
-            return new RunToPosition(xLinear, // MOTOR TO MOVE
-                    clicks, // TARGET POSITION, IN TICKS
-                    xLinearController, // CONTROLLER TO IMPLEMENT
-                    this); // IMPLEMENTED SUBSYSTEM
-        }
 
         @Override
         public void initialize () {
-            xLinear = new MotorEx("xLinear");
-            yLinear = new MotorEx("yLinear");
+        }
+        @Override
+        public void periodic(){
+            yLinear.setPower(yLinearControl.calculate());
         }
 
-        @Override
-        public Command getDefaultCommand () {
-            return new ParallelGroup(
-                    new HoldPosition(xLinear, xLinearController, this),
-                    new HoldPosition(yLinear, yLinearController, this)
-                    );
-        }
 }
