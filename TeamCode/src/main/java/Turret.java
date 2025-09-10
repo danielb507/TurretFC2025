@@ -7,6 +7,7 @@ import com.bylazar.graph.PanelsGraph;
 import com.bylazar.telemetry.PanelsTelemetry;
 
 import dev.nextftc.control.ControlSystem;
+import dev.nextftc.control.KineticState;
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.subsystems.Subsystem;
 import dev.nextftc.hardware.impl.MotorEx;
@@ -24,8 +25,8 @@ public class Turret implements Subsystem {
     private Turret() { }
 
         // USER CODE
-
-        public MotorEx xLinear = new MotorEx("yLinear");
+        public KineticState state = new KineticState(0, 0, 0);
+        public MotorEx xLinear = new MotorEx("xLinear");
         public MotorEx yLinear = new MotorEx("yLinear");
 
         private ControlSystem yLinearControl = ControlSystem.builder()
@@ -33,13 +34,20 @@ public class Turret implements Subsystem {
                 .elevatorFF(0)
                 .build();
 
+        public void setYLinear(double ty){
+            state = new KineticState(yLinear.getCurrentPosition(), yLinear.getVelocity());
+            yLinear.setPower(
+                    yLinearControl.calculate(
+                            state
+                            )
+            );
+        }
 
         @Override
         public void initialize () {
         }
         @Override
         public void periodic(){
-            yLinear.setPower(yLinearControl.calculate());
         }
 
 }
