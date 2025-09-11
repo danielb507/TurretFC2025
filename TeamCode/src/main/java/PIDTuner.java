@@ -6,13 +6,16 @@ import com.bylazar.telemetry.TelemetryManager;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import dev.nextftc.core.components.*;
+
+import dev.nextftc.core.components.SubsystemComponent;
 import dev.nextftc.ftc.NextFTCOpMode;
 
 @Configurable
 @Autonomous(name = "PIDTuner")
 public class PIDTuner extends NextFTCOpMode {
     Limelight3A limelight;
-    
+
     @Override
     public void onInit() {
         limelight = hardwareMap.get(Limelight3A.class, "limelight");

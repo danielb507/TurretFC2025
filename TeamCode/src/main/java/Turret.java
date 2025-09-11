@@ -7,6 +7,7 @@ import com.bylazar.graph.PanelsGraph;
 import com.bylazar.telemetry.PanelsTelemetry;
 
 import dev.nextftc.control.ControlSystem;
+import dev.nextftc.control.KineticState;
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.subsystems.Subsystem;
 import dev.nextftc.hardware.impl.MotorEx;
@@ -39,7 +40,9 @@ public class Turret implements Subsystem {
         }
         @Override
         public void periodic(){
-            yLinear.setPower(yLinearControl.calculate());
+            KineticState state = new KineticState(yLinear.getCurrentPosition());
+            yLinearControl.setGoal(new KineticState(40));
+            yLinearControl.calculate(state);
         }
 
 }
