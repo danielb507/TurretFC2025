@@ -6,7 +6,11 @@ import com.bylazar.telemetry.TelemetryManager;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+
 import dev.nextftc.core.components.*;
+import dev.nextftc.control.ControlSystem;
+import dev.nextftc.control.KineticState;
 
 import dev.nextftc.core.components.SubsystemComponent;
 import dev.nextftc.ftc.NextFTCOpMode;
@@ -15,9 +19,16 @@ import dev.nextftc.ftc.NextFTCOpMode;
 @Autonomous(name = "PIDTuner")
 public class PIDTuner extends NextFTCOpMode {
     Limelight3A limelight;
+    private ControlSystem turret;
+    private DcMotorEx yLinear;
 
     @Override
     public void onInit() {
+        yLinear = hardwareMap.get(DcMotorEx.class, "yLinear");
+        turret = ControlSystem.builder()
+                .posPid(0.1, 0.0, 0.0)
+                .build();
+        turret.setGoal(new KineticState(0.0));
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         limelight.setPollRateHz(100); // This sets how often we ask Limelight for data (100 times per second)
         limelight.start(); // This tells Limelight to start looking!
@@ -31,6 +42,9 @@ public class PIDTuner extends NextFTCOpMode {
         if (result != null) {
             if (result.isValid()) {
                 telemetry.addData("ty", result.getTy());
+                yLinear.setPower(turret.calculate(
+                        new KineticState(50)
+                ));
             }
         }
     }

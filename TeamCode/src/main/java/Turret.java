@@ -1,5 +1,4 @@
 
-import com.acmerobotics.dashboard.config.Config;
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.graph.GraphManager;
 import com.bylazar.telemetry.TelemetryManager;
@@ -13,7 +12,6 @@ import dev.nextftc.core.subsystems.Subsystem;
 import dev.nextftc.hardware.impl.MotorEx;
 
 @Configurable
-@Config
 public class Turret implements Subsystem {
     // BOILERPLATE
 
