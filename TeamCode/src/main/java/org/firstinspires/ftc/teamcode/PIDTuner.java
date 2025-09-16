@@ -33,6 +33,7 @@ public class PIDTuner extends NextFTCOpMode {
         if (result != null) {
             if (result.isValid()) {
                 telemetry.addData("ty", result.getTy());
+
             }
         }
     }

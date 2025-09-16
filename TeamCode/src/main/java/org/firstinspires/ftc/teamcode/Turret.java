@@ -1,5 +1,4 @@
 package org.firstinspires.ftc.teamcode;
-
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.graph.GraphManager;
 import com.bylazar.telemetry.TelemetryManager;
@@ -10,38 +9,36 @@ import dev.nextftc.control.ControlSystem;
 import dev.nextftc.control.KineticState;
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.subsystems.Subsystem;
+import dev.nextftc.hardware.controllable.RunToState;
 import dev.nextftc.hardware.impl.MotorEx;
 
-@Configurable
 public class Turret implements Subsystem {
-    // BOILERPLATE
-
-
-    public static double KP = .005;
-    public static double KI = 0;
-    public static double KD = 0;
     public static final Turret INSTANCE = new Turret();
     private Turret() { }
 
-    // USER CODE
+    private MotorEx yLinear = new MotorEx("yLinear");
 
-    public MotorEx xLinear = new MotorEx("yLinear");
-    public MotorEx yLinear = new MotorEx("yLinear");
-
-    private ControlSystem yLinearControl = ControlSystem.builder()
-            .posPid(KP, KI, KD)
+    private ControlSystem controlSystem = ControlSystem.builder()
+            .posPid(0.005, 0, 0)
             .elevatorFF(0)
             .build();
 
+    public void setYLinear(double ty){
+        double encoderClicksPerRev = 576d;
+        double target =  encoderClicksPerRev / ty;
+        new RunToState(
+                controlSystem,
+                new KineticState(
+                        yLinear.getState().getPosition() + ty,
+                        0,
+                        0
+                ),
+                new KineticState(Double.POSITIVE_INFINITY)
+        );
+    }
 
     @Override
-    public void initialize () {
+    public void periodic() {
+        yLinear.setPower(controlSystem.calculate(yLinear.getState()));
     }
-    @Override
-    public void periodic(){
-        KineticState state = new KineticState(yLinear.getCurrentPosition());
-        yLinearControl.setGoal(new KineticState(40));
-        yLinearControl.calculate(state);
-    }
-
 }
