@@ -4,6 +4,7 @@ import com.bylazar.graph.GraphManager;
 import com.bylazar.telemetry.TelemetryManager;
 import com.bylazar.graph.PanelsGraph;
 import com.bylazar.telemetry.PanelsTelemetry;
+import com.qualcomm.hardware.limelightvision.LLResult;
 
 import dev.nextftc.control.ControlSystem;
 import dev.nextftc.control.KineticState;
@@ -18,6 +19,8 @@ public class Turret implements Subsystem {
 
     private MotorEx yLinear = new MotorEx("yLinear");
 
+    KineticState targetState = new KineticState();
+
     private ControlSystem controlSystem = ControlSystem.builder()
             .posPid(0.005, 0, 0)
             .elevatorFF(0)
@@ -26,19 +29,18 @@ public class Turret implements Subsystem {
     public void setYLinear(double ty){
         double encoderClicksPerRev = 576d;
         double target =  encoderClicksPerRev / ty;
-        new RunToState(
-                controlSystem,
-                new KineticState(
-                        yLinear.getState().getPosition() + ty,
-                        0,
-                        0
-                ),
-                new KineticState(Double.POSITIVE_INFINITY)
-        );
+        targetState = new KineticState(yLinear.getState().getPosition() + target);
+        controlSystem.setGoal(targetState);
     }
 
     @Override
     public void periodic() {
         yLinear.setPower(controlSystem.calculate(yLinear.getState()));
+        LLResult result = TurretAuto.limelight.getLatestResult();
+        if (result != null) {
+            if (result.isValid()) {
+                setYLinear(result.getTy());
+            }
+        }
     }
 }
