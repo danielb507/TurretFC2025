@@ -29,11 +29,12 @@ public class PIDTuner extends NextFTCOpMode {
 
     @Override
     public void onUpdate() {
-        LLResult result = limelight.getLatestResult();
-        if (result != null) {
-            if (result.isValid()) {
-                telemetry.addData("ty", result.getTy());
-
+        while(isStarted()){
+            LLResult result = limelight.getLatestResult();
+            if (result != null) {
+                if (result.isValid()) {
+                    telemetry.addData("ty", result.getTy());
+                }
             }
         }
     }

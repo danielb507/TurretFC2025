@@ -4,13 +4,13 @@ import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.Turret;
 
 import dev.nextftc.core.components.SubsystemComponent;
 import dev.nextftc.ftc.NextFTCOpMode;
 
-@Configurable
 @Autonomous(name = "TurretAuto")
 public class TurretAuto extends NextFTCOpMode {
     public TurretAuto() {
@@ -18,8 +18,8 @@ public class TurretAuto extends NextFTCOpMode {
                 new SubsystemComponent(Turret.INSTANCE)
         );
     }
-
-    static public Limelight3A limelight;
+    Limelight3A limelight;
+    public static boolean isStarted = false;
     double motorTarget = 0;
     @Override
     public void onInit() {
@@ -29,12 +29,22 @@ public class TurretAuto extends NextFTCOpMode {
         limelight.start(); // This tells Limelight to start looking!
         limelight.pipelineSwitch(0); // Switch to pipeline number 0
     }
-
+    @Override
+    public void onStartButtonPressed(){
+         isStarted = isStarted();
+    }
 
     @Override
     public void onUpdate() {
-
-
+        if(isStarted()) {
+            LLResult result = limelight.getLatestResult();
+            if (result != null) {
+                if (result.isValid()) {
+                    Turret.INSTANCE.setYLinear(result.getTy());
+                    Turret.INSTANCE.setXLinear(result.getTx());
+                }
+            }
+        }
     }
 }
 
