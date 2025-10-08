@@ -23,8 +23,7 @@ public class Turret implements Subsystem {
     private Turret() { }
 
 
-    private MotorEx yLinear = new MotorEx("yLinear");
-    private MotorEx xLinear = new MotorEx("xLinear");
+    private MotorEx yLinear = new MotorEx("ylinear");
 
     KineticState targetStateY = new KineticState();
     KineticState targetStateX = new KineticState();
@@ -45,22 +44,16 @@ public class Turret implements Subsystem {
         targetStateY = new KineticState(yLinear.getState().getPosition() + target);
         yLinearControl.setGoal(targetStateY);
     }
-    public void setXLinear(double tx){
-        double encoderClicksPerRev = 1440d / 360d;
-        double target =  (encoderClicksPerRev * tx);
-        targetStateX = new KineticState(xLinear.getState().getPosition() + target);
-        xLinearControl.setGoal(targetStateX);
-    }
+
     @Override
     public void initialize(){
     }
     @Override
     public void periodic() {
         if(TurretAuto.isStarted) {
-            xLinear.setPower(xLinearControl.calculate(xLinear.getState()));
-            yLinear.setPower(xLinearControl.calculate(xLinear.getState()));
+            yLinear.setPower(yLinearControl.calculate(yLinear.getState()));
+
             Manager.addData("Goal", xLinearControl.getGoal().getPosition());
-            Manager.addData("State", xLinear.getCurrentPosition());
             Manager.update();
         }
     }
