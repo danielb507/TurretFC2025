@@ -25,6 +25,7 @@ public class Turret implements Subsystem {
 
     private MotorEx yLinear = new MotorEx("ylinear");
 
+
     KineticState targetStateY = new KineticState();
     KineticState targetStateX = new KineticState();
 
@@ -51,7 +52,6 @@ public class Turret implements Subsystem {
     @Override
     public void periodic() {
         if(TurretAuto.isStarted) {
-            yLinear.setPower(yLinearControl.calculate(yLinear.getState()));
 
             Manager.addData("Goal", xLinearControl.getGoal().getPosition());
             Manager.update();
