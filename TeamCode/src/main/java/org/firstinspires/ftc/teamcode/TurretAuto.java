@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
 import static org.firstinspires.ftc.teamcode.pedroPathing.Constants.createFollower;
 
 import com.bylazar.configurables.annotations.Configurable;
@@ -32,65 +33,27 @@ public class TurretAuto extends NextFTCOpMode {
         );
     }
 
-    public static Limelight3A limelight;
-    public static boolean isStarted = false;
-    int id = 0;
-    LLResultTypes.FiducialResult lastResult = null;
-    int lastId = 0;
-    double motorTarget = 0;
+    static boolean isStarted = false;
+    public static Limelight3A limelight = null;
     @Override
     public void onInit() {
-
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         limelight.setPollRateHz(100); // This sets how often we ask Limelight for data (100 times per second)
         limelight.start(); // This tells Limelight to start looking!
         limelight.pipelineSwitch(0); // Switch to pipeline number 0
-
-
     }
+
     @Override
-    public void onStartButtonPressed(){
-         isStarted = isStarted();
+    public void onStartButtonPressed() {
+        isStarted = isStarted();
     }
 
     @Override
     public void onUpdate() {
-        if(isStarted()) {
+        Turret.INSTANCE.lockOn();
 
-            LLResult result = limelight.getLatestResult();
+        telemetry.update();
 
-
-            if (result != null) {
-                if (result.isValid()) {
-                    List<LLResultTypes.FiducialResult> feducialResults =  result.getFiducialResults();
-                    telemetry.addData("Apriltag Id:", id);
-                    telemetry.addData("Tx:", feducialResults.get(0).getTargetXDegrees());
-
-                    id = feducialResults.get(0).getFiducialId();
-                    if(id != lastId) {
-                        lastResult = feducialResults.get(0);
-
-                        if (lastResult != null){
-                            if(lastResult.getTargetXDegrees() < 0){
-                                follower().turnDegrees(Math.abs(lastResult.getTargetXDegrees()), true);
-                            }
-                            else{
-                                follower().turnDegrees(Math.abs(lastResult.getTargetXDegrees()), false);
-                            }
-                            telemetry.addData("last tx:",lastResult.getTargetXDegrees());
-
-                        }
-                        lastId = id;
-                    }
-                }
-            }
-
-
-
-
-            telemetry.update();
-
-        }
     }
 }
 

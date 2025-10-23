@@ -1,10 +1,15 @@
 package org.firstinspires.ftc.teamcode;
+import static dev.nextftc.extensions.pedro.PedroComponent.follower;
+import static dev.nextftc.ftc.ActiveOpMode.isStarted;
+
 import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.graph.GraphManager;
 import com.bylazar.telemetry.TelemetryManager;
 import com.bylazar.graph.PanelsGraph;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import dev.nextftc.control.ControlSystem;
@@ -15,6 +20,8 @@ import dev.nextftc.hardware.controllable.RunToState;
 import dev.nextftc.hardware.impl.MotorEx;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
+import java.util.List;
+
 @Configurable
 public class Turret implements Subsystem {
     public static final Turret INSTANCE = new Turret();
@@ -24,10 +31,12 @@ public class Turret implements Subsystem {
 
 
     private MotorEx yLinear = new MotorEx("ylinear");
-
+    public static boolean isStarted = false;
+    LLResultTypes.FiducialResult lastResult = null;
 
     KineticState targetStateY = new KineticState();
     KineticState targetStateX = new KineticState();
+
 
     private ControlSystem yLinearControl = ControlSystem.builder()
             .posPid(0.007, 0.0, 0.0001)
@@ -39,6 +48,38 @@ public class Turret implements Subsystem {
             .elevatorFF(0)
             .build();
 
+    public void lockOn(){
+
+            LLResult result = TurretAuto.limelight.getLatestResult();
+
+
+            if (result != null) {
+
+
+                if (result.isValid()) {
+                    List<LLResultTypes.FiducialResult> feducialResults =  result.getFiducialResults();
+                    //telemetry.addData("Tx:", feducialResults.get(0).getTargetXDegrees());
+                    lastResult = feducialResults.get(0);
+
+                    if (lastResult != null){
+                        if(lastResult.getTargetXDegrees() < -2){
+                            follower().turnDegrees(Math.abs(lastResult.getTargetXDegrees()), true);
+                        }
+                        else if (lastResult.getTargetXDegrees() > 2){
+                            follower().turnDegrees(Math.abs(lastResult.getTargetXDegrees()), false);
+                        }
+                        else{
+                            return;
+                        }
+                        //telemetry.addData("last tx:",lastResult.getTargetXDegrees());
+
+                    }
+                }
+            }
+
+            //telemetry.update();
+
+    }
     public void setYLinear(double ty){
         double encoderClicksPerRev = 1440d / 360d;
         double target =  (encoderClicksPerRev * ty);
@@ -47,14 +88,11 @@ public class Turret implements Subsystem {
     }
 
     @Override
-    public void initialize(){
+    public void initialize() {
+
     }
     @Override
     public void periodic() {
-        if(TurretAuto.isStarted) {
 
-            Manager.addData("Goal", xLinearControl.getGoal().getPosition());
-            Manager.update();
-        }
     }
 }
