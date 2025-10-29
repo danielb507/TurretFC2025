@@ -20,8 +20,11 @@ public class Constants {
         .mass(8.799692)
         .forwardZeroPowerAcceleration(-44.584)
         .lateralZeroPowerAcceleration(-66.0535)
-        .translationalPIDFCoefficients(new PIDFCoefficients(0.07, 0, 0.008, 0.025));
-    //Finish Tunning
+        .translationalPIDFCoefficients(new PIDFCoefficients(0.07, 0, 0.008, 0.025))
+        .headingPIDFCoefficients(new PIDFCoefficients(0.9, 0, 0.05, 0.025))
+        .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.015, 0, 0.000006, 1, 0.035))
+        .centripetalScaling(0.0005);
+
 
     public static MecanumConstants driveConstants = new MecanumConstants()
             .maxPower(1)

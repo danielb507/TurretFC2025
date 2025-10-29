@@ -50,7 +50,7 @@ public class Turret implements Subsystem {
 
     public void lockOn(){
 
-            LLResult result = TurretAuto.limelight.getLatestResult();
+            LLResult result = Teleop.limelight.getLatestResult();
 
 
             if (result != null) {

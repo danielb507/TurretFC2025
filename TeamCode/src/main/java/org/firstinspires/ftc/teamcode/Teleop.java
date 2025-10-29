@@ -15,6 +15,7 @@ import dev.nextftc.hardware.impl.Direction;
 import dev.nextftc.hardware.impl.MotorEx;
 import dev.nextftc.hardware.impl.ServoEx;
 
+import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -30,11 +31,11 @@ import java.util.TimerTask;
 public class Teleop extends NextFTCOpMode {
 
     CRServoEx intake = new CRServoEx("intake");
-    ServoEx leftRelease = new ServoEx("intake");
-    ServoEx rightRelease = new ServoEx("intake");
-    ServoEx triggerServo = new ServoEx("intake");
-    MotorEx rightFlyWheel = new MotorEx("intake");
-    MotorEx leftFlyWheel = new MotorEx("intake");
+    ServoEx leftRelease = new ServoEx("lbar");
+    ServoEx rightRelease = new ServoEx("rbar");
+    ServoEx triggerServo = new ServoEx("launch");
+    MotorEx rightFlyWheel = new MotorEx("rfw");
+    MotorEx leftFlyWheel = new MotorEx("lfw");
 
 
 
@@ -85,6 +86,16 @@ public class Teleop extends NextFTCOpMode {
         triggerButton.whenFalse(() -> triggerServo.setPosition(.7));
         intakeButton.whenTrue(() -> intake.setPower(-1));
         intakeButton.whenFalse(() -> intake.setPower(0));
+    }
+
+    public static Limelight3A limelight = null;
+
+    @Override
+    public void onInit() {
+        limelight = hardwareMap.get(Limelight3A.class, "limelight");
+        limelight.setPollRateHz(100); // This sets how often we ask Limelight for data (100 times per second)
+        limelight.start(); // This tells Limelight to start looking!
+        limelight.pipelineSwitch(0); // Switch to pipeline number 0
     }
 
     @Override
