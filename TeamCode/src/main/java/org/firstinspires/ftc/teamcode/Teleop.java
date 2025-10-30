@@ -65,27 +65,26 @@ public class Teleop extends NextFTCOpMode {
     @Override
     public void onStartButtonPressed() {
         DriverControlledCommand driverControlled = new PedroDriverControlled(
-                Gamepads.gamepad1().leftStickY(),
-                Gamepads.gamepad1().leftStickX(),
-                Gamepads.gamepad1().rightStickX(),
+                Gamepads.gamepad1().leftStickY().negate(),
+                Gamepads.gamepad1().leftStickX().negate(),
+                Gamepads.gamepad1().rightStickX().negate(),
                 false
         );
         driverControlled.schedule();
 
+        targetButton.whenBecomesTrue(() -> Turret.INSTANCE.lockOn());
+        runFlyWheelButton.whenTrue(() -> runFlyWheel());
+        rightReleaseButton.whenBecomesTrue(() -> rightReleaseLift());
+        leftReleaseButton.whenBecomesTrue(() -> leftReleaseLift());
+        triggerButton.whenTrue(() -> triggerServo.setPosition(.4));
+        triggerButton.whenFalse(() -> triggerServo.setPosition(.7));
+        intakeButton.whenTrue(() -> intake.setPower(-1));
+        intakeButton.whenFalse(() -> intake.setPower(0));
     }
 
     @Override
     public void onUpdate() {
        BindingManager.update();
-
-       targetButton.whenBecomesTrue(Turret.INSTANCE::lockOn);
-       runFlyWheelButton.whenTrue(runFlyWheel());
-       rightReleaseButton.whenBecomesTrue(rightReleaseLift());
-       leftReleaseButton.whenBecomesTrue(leftReleaseLift());
-        triggerButton.whenTrue(() -> triggerServo.setPosition(.4));
-        triggerButton.whenFalse(() -> triggerServo.setPosition(.7));
-        intakeButton.whenTrue(() -> intake.setPower(-1));
-        intakeButton.whenFalse(() -> intake.setPower(0));
     }
 
     public static Limelight3A limelight = null;
