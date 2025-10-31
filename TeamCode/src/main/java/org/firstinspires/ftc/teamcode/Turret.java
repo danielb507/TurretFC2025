@@ -26,7 +26,7 @@ import java.util.List;
 public class Turret implements Subsystem {
     public static final Turret INSTANCE = new Turret();
     GraphManager Manager = PanelsGraph.INSTANCE.getManager();
-
+    boolean switcher = false;
     private Turret() { }
 
 
@@ -47,13 +47,18 @@ public class Turret implements Subsystem {
             .posPid(0.004, 0.0, 0.0001)
             .elevatorFF(0)
             .build();
-
+    public void varSwitch1(){
+        switcher = true;
+    }
+    public void varSwitch2(){
+        switcher = false;
+    }
     public void lockOn(){
 
             LLResult result = Teleop.limelight.getLatestResult();
 
 
-            if (result != null) {
+            if (result != null && switcher == true) {
 
 
                 if (result.isValid()) {
@@ -62,10 +67,10 @@ public class Turret implements Subsystem {
                     lastResult = feducialResults.get(0);
 
                     if (lastResult != null){
-                        if(lastResult.getTargetXDegrees() < -2){
+                        if(lastResult.getTargetXDegrees() < -2 && switcher){
                             follower().turnDegrees(Math.abs(lastResult.getTargetXDegrees()), true);
                         }
-                        else if (lastResult.getTargetXDegrees() > 2){
+                        else if (lastResult.getTargetXDegrees() > 2 && switcher){
                             follower().turnDegrees(Math.abs(lastResult.getTargetXDegrees()), false);
                         }
                         else{

@@ -64,6 +64,7 @@ public class Teleop extends NextFTCOpMode {
 
     @Override
     public void onStartButtonPressed() {
+        telemetry.addData("switcher: ",Turret.INSTANCE.switcher);
         DriverControlledCommand driverControlled = new PedroDriverControlled(
                 Gamepads.gamepad1().leftStickY().negate(),
                 Gamepads.gamepad1().leftStickX().negate(),
@@ -72,14 +73,25 @@ public class Teleop extends NextFTCOpMode {
         );
         driverControlled.schedule();
 
-        targetButton.whenBecomesTrue(() -> Turret.INSTANCE.lockOn());
-        runFlyWheelButton.whenTrue(() -> runFlyWheel());
-        rightReleaseButton.whenBecomesTrue(() -> rightReleaseLift());
-        leftReleaseButton.whenBecomesTrue(() -> leftReleaseLift());
+        Turret.INSTANCE.lockOn();
+        button(() -> gamepad1.dpad_down)
+                .toggleOnBecomesTrue()
+                .whenBecomesTrue(() -> Turret.INSTANCE.varSwitch1())
+                .whenBecomesFalse(() -> Turret.INSTANCE.varSwitch2());
+        button(() -> gamepad1.b)
+                .toggleOnBecomesTrue()
+                .whenBecomesTrue(() -> runFlyWheel())
+                .whenBecomesFalse(() -> stopFlyWheel());
+        rightReleaseButton.whenBecomesTrue(() -> rightRelease.setPosition(0));
+        rightReleaseButton.whenBecomesFalse(() -> rightRelease.setPosition(0.4));
+        leftReleaseButton.whenBecomesTrue(() -> leftRelease.setPosition(0.8));
+        leftReleaseButton.whenBecomesFalse(() -> leftRelease.setPosition(0.3));
         triggerButton.whenTrue(() -> triggerServo.setPosition(.4));
         triggerButton.whenFalse(() -> triggerServo.setPosition(.7));
-        intakeButton.whenTrue(() -> intake.setPower(-1));
-        intakeButton.whenFalse(() -> intake.setPower(0));
+        button(() -> gamepad1.left_bumper)
+                .toggleOnBecomesTrue()
+                .whenBecomesTrue(() -> intake.setPower(-1))
+                .whenBecomesFalse(() -> intake.setPower(0));
     }
 
     @Override
@@ -102,6 +114,17 @@ public class Teleop extends NextFTCOpMode {
         BindingManager.reset();
     }
 
+    Runnable runFlyWheel(){
+        leftFlyWheel.setPower(0.8);
+        rightFlyWheel.setPower(-0.8);
+        return null;
+    }
+    Runnable stopFlyWheel(){
+        leftFlyWheel.setPower(0);
+        rightFlyWheel.setPower(0);
+        return null;
+    }
+    /*
     Runnable rightReleaseLift(){
         rightRelease.setPosition(0);
         new Timer().schedule(new TimerTask()
@@ -113,11 +136,6 @@ public class Teleop extends NextFTCOpMode {
             }
         }, 4000 );
         return null;
-    }
-    Runnable runFlyWheel(){
-        leftFlyWheel.setPower(1);
-        rightFlyWheel.setPower(-1);
-       return null;
     }
     Runnable leftReleaseLift(){
         leftRelease.setPosition(0);
@@ -131,7 +149,7 @@ public class Teleop extends NextFTCOpMode {
         }, 4000 );
         return null;
     }
-    /*if(gamepad1.a){
+    if(gamepad1.a){
                 intake.setPower(-1);
             } else {
                 intake.setPower(0);
@@ -166,4 +184,5 @@ public class Teleop extends NextFTCOpMode {
             }
 
      */
+
 }
