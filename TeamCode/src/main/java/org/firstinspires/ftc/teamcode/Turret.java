@@ -22,13 +22,10 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import java.util.List;
 
-@Configurable
 public class Turret implements Subsystem {
     public static final Turret INSTANCE = new Turret();
-    GraphManager Manager = PanelsGraph.INSTANCE.getManager();
     boolean switcher = false;
     private Turret() { }
-
 
     private MotorEx yLinear = new MotorEx("ylinear");
     public static boolean isStarted = false;

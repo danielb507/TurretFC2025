@@ -84,8 +84,7 @@ public class Teleop extends NextFTCOpMode {
         driverControlled.schedule();
 
         button(() -> gamepad1.dpad_down)
-                .toggleOnBecomesTrue()
-                .whenBecomesTrue(() -> lockOn())
+                .whenTrue(() -> lockOn())
                 .whenBecomesFalse(() -> lockOff());
 
         button(() -> gamepad1.b)

@@ -1,35 +1,38 @@
 package org.firstinspires.ftc.teamcode;
 
-import com.bylazar.configurables.annotations.Configurable;
-import com.bylazar.graph.GraphManager;
-import com.bylazar.graph.PanelsGraph;
+
+
+
+import com.acmerobotics.dashboard.config.Config;
 
 import dev.nextftc.control.ControlSystem;
 import dev.nextftc.control.KineticState;
 import dev.nextftc.core.subsystems.Subsystem;
 import dev.nextftc.hardware.impl.MotorEx;
-
-@Configurable
+@Config
 public class FlyWheel implements Subsystem {
-    GraphManager Manager = PanelsGraph.INSTANCE.getManager();
+    public static double P = 0.0;
+    public static double I = 0.0;
+    public static double D = 0.0;
 
+    public static final FlyWheel INSTANCE = new FlyWheel();
+    public KineticState LeftFlyWheelTarget = new KineticState();
     private FlyWheel() {
     }
 
 
-    private MotorEx leftFlyWheel = new MotorEx("lfw");
+    public MotorEx leftFlyWheel = new MotorEx("lfw");
 
     KineticState leftFlyWheelTarget = new KineticState();
 
     private ControlSystem leftFlyWheelControl = ControlSystem.builder()
-            .velPid(0.007, 0.0, 0.0001)
+            .velPid(P, I, D)
             .elevatorFF(0)
             .build();
 
-    public void setYLinear(double ty){
-        double encoderClicksPerRev = 28; //what is the econder resoltion
-        double target =  (encoderClicksPerRev);
-        leftFlyWheelTarget = new KineticState(leftFlyWheel.getState().getVelocity() + target);
+    public void setLeftFlyWheel(double targetSpeed){
+        double target = targetSpeed;
+        leftFlyWheelTarget = new KineticState(0, target);
         leftFlyWheelControl.setGoal(leftFlyWheelTarget);
     }
 
@@ -40,5 +43,6 @@ public class FlyWheel implements Subsystem {
     @Override
     public void periodic() {
 
+        leftFlyWheel.setPower(leftFlyWheelControl.calculate());
     }
 }
