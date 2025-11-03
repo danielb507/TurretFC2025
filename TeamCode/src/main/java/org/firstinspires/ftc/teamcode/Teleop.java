@@ -84,7 +84,8 @@ public class Teleop extends NextFTCOpMode {
         driverControlled.schedule();
 
         button(() -> gamepad1.dpad_down)
-                .whenTrue(() -> lockOn())
+                .toggleOnBecomesTrue()
+                .whenBecomesTrue(() -> lockOn())
                 .whenBecomesFalse(() -> lockOff());
 
         button(() -> gamepad1.b)
@@ -132,21 +133,6 @@ public class Teleop extends NextFTCOpMode {
         leftFlyWheel.setPower(0);
         rightFlyWheel.setPower(0);
         return null;
-    }
-    public void lock(){
-        LLResult result = Teleop.limelight.getLatestResult();
-        if (result.isValid()) {
-            List<LLResultTypes.FiducialResult> feducialResults = result.getFiducialResults();
-            lastResult = feducialResults.get(0);
-            telemetry.addData("target", lastResult.getTargetXDegrees());
-            if (result != null && result.isValid()) {
-                if (lastResult.getTargetXDegrees() < -2) {
-                    new TurnBy(Angle.fromDeg(abs(lastResult.getTargetXDegrees())));
-                } else if (lastResult.getTargetXDegrees() > 2) {
-                    new TurnBy(Angle.fromDeg(-(lastResult.getTargetXDegrees())));
-                }
-            }
-        }
     }
     public void lockOn(){
             LLResult result = Teleop.limelight.getLatestResult();
