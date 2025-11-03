@@ -1,11 +1,15 @@
 package org.firstinspires.ftc.teamcode;
 
+import static java.lang.Math.abs;
+
 import dev.nextftc.bindings.BindingManager;
 import dev.nextftc.bindings.Button;
 import dev.nextftc.core.components.BindingsComponent;
 import dev.nextftc.core.components.SubsystemComponent;
+import dev.nextftc.core.units.Angle;
 import dev.nextftc.extensions.pedro.PedroComponent;
 import dev.nextftc.extensions.pedro.PedroDriverControlled;
+import dev.nextftc.extensions.pedro.TurnBy;
 import dev.nextftc.ftc.Gamepads;
 import dev.nextftc.ftc.NextFTCOpMode;
 import dev.nextftc.ftc.components.BulkReadComponent;
@@ -15,6 +19,8 @@ import dev.nextftc.hardware.impl.Direction;
 import dev.nextftc.hardware.impl.MotorEx;
 import dev.nextftc.hardware.impl.ServoEx;
 
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -22,7 +28,9 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import static dev.nextftc.bindings.Bindings.*;
+import static dev.nextftc.extensions.pedro.PedroComponent.follower;
 
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -37,7 +45,9 @@ public class Teleop extends NextFTCOpMode {
     MotorEx rightFlyWheel = new MotorEx("rfw");
     MotorEx leftFlyWheel = new MotorEx("lfw");
 
+    LLResultTypes.FiducialResult lastResult = null;
 
+    boolean running = false;
 
     Button targetButton = button(() -> gamepad1.dpad_down);
     Button runFlyWheelButton = button(() -> gamepad1.b);
@@ -49,6 +59,12 @@ public class Teleop extends NextFTCOpMode {
     double timeLastReleasedRight = 0.0;
 
 
+    DriverControlledCommand driverControlled = new PedroDriverControlled(
+            Gamepads.gamepad1().leftStickY().negate(),
+            Gamepads.gamepad1().leftStickX().negate(),
+            Gamepads.gamepad1().rightStickX().negate(),
+            false
+    );
 
     public Teleop() {
         addComponents(
@@ -64,20 +80,12 @@ public class Teleop extends NextFTCOpMode {
 
     @Override
     public void onStartButtonPressed() {
-        telemetry.addData("switcher: ",Turret.INSTANCE.switcher);
-        DriverControlledCommand driverControlled = new PedroDriverControlled(
-                Gamepads.gamepad1().leftStickY().negate(),
-                Gamepads.gamepad1().leftStickX().negate(),
-                Gamepads.gamepad1().rightStickX().negate(),
-                false
-        );
+
         driverControlled.schedule();
 
-        Turret.INSTANCE.lockOn();
         button(() -> gamepad1.dpad_down)
-                .toggleOnBecomesTrue()
-                .whenBecomesTrue(() -> Turret.INSTANCE.varSwitch1())
-                .whenBecomesFalse(() -> Turret.INSTANCE.varSwitch2());
+                .whenBecomesTrue(() -> lock());
+
         button(() -> gamepad1.b)
                 .toggleOnBecomesTrue()
                 .whenBecomesTrue(() -> runFlyWheel())
@@ -97,6 +105,7 @@ public class Teleop extends NextFTCOpMode {
     @Override
     public void onUpdate() {
        BindingManager.update();
+       telemetry.addData("velocity", lastResult.getTargetXDegrees());
     }
 
     public static Limelight3A limelight = null;
@@ -123,6 +132,55 @@ public class Teleop extends NextFTCOpMode {
         leftFlyWheel.setPower(0);
         rightFlyWheel.setPower(0);
         return null;
+    }
+    public void lock(){
+        LLResult result = Teleop.limelight.getLatestResult();
+        if (result.isValid()) {
+            List<LLResultTypes.FiducialResult> feducialResults = result.getFiducialResults();
+            lastResult = feducialResults.get(0);
+            telemetry.addData("target", lastResult.getTargetXDegrees());
+            if (result != null && result.isValid()) {
+                if (lastResult.getTargetXDegrees() < -2) {
+                    new TurnBy(Angle.fromDeg(abs(lastResult.getTargetXDegrees())));
+                } else if (lastResult.getTargetXDegrees() > 2) {
+                    new TurnBy(Angle.fromDeg(-(lastResult.getTargetXDegrees())));
+                }
+            }
+        }
+    }
+    public void lockOn(){
+        if(running) {
+            LLResult result = Teleop.limelight.getLatestResult();
+            if (result != null) {
+
+                if (result.isValid()) {
+                    List<LLResultTypes.FiducialResult> feducialResults = result.getFiducialResults();
+                    //telemetry.addData("Tx:", feducialResults.get(0).getTargetXDegrees());
+                    lastResult = feducialResults.get(0);
+
+                    if (lastResult != null) {
+
+                        if (lastResult.getTargetXDegrees() < -2) {
+                            follower().turnDegrees(abs(lastResult.getTargetXDegrees()), true);
+                        }
+                        else if (lastResult.getTargetXDegrees() > 2) {
+                            follower().turnDegrees(abs(lastResult.getTargetXDegrees()), false);
+                        }
+                        //telemetry.addData("last tx:",lastResult.getTargetXDegrees());
+
+                    }
+                }
+            }
+        }
+
+        //telemetry.update();
+
+    }
+    public void lockOff(){
+        running = false;
+        follower().breakFollowing();
+        driverControlled.start();
+
     }
     /*
     Runnable rightReleaseLift(){
