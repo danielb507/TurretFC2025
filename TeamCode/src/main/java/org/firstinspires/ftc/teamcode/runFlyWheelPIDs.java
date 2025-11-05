@@ -20,6 +20,7 @@ import dev.nextftc.hardware.impl.Direction;
 import dev.nextftc.hardware.impl.MotorEx;
 import dev.nextftc.hardware.impl.ServoEx;
 
+import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
@@ -35,13 +36,10 @@ import static dev.nextftc.extensions.pedro.PedroComponent.follower;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-
+@Configurable
 @TeleOp(name = "runFlyWheelPIDs")
 
 public class runFlyWheelPIDs extends NextFTCOpMode {
-
-    MotorEx rightFlyWheel = new MotorEx("rfw");
-    MotorEx leftFlyWheel = new MotorEx("lfw");
 
 
     public runFlyWheelPIDs() {
@@ -56,8 +54,7 @@ public class runFlyWheelPIDs extends NextFTCOpMode {
 
     @Override
     public void onUpdate() {
-        FlyWheel.INSTANCE.setLeftFlyWheel(50);
-        //telemetry.addData(Fly)
+        FlyWheel.INSTANCE.on.schedule();
         telemetry.update();
     }
 
