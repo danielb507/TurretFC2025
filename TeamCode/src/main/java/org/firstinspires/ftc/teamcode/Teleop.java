@@ -69,7 +69,7 @@ public class Teleop extends NextFTCOpMode {
     public Teleop() {
         addComponents(
                 new SubsystemComponent(Turret.INSTANCE),
-                //new SubsystemComponent(FlyWheel.INSTANCE),
+                new SubsystemComponent(FlyWheel.INSTANCE),
                 new PedroComponent(Constants::createFollower),
                 BulkReadComponent.INSTANCE,
                 BindingsComponent.INSTANCE
@@ -125,17 +125,13 @@ public class Teleop extends NextFTCOpMode {
     }
 
     Runnable runFlyWheel(){
-        //FlyWheel.INSTANCE.on.schedule();
-        //FlyWheel.INSTANCE.on1.schedule();
-        leftFlyWheel.setPower(.5);
-        rightFlyWheel.setPower(-.5);
+        FlyWheel.INSTANCE.on.schedule();
+        FlyWheel.INSTANCE.on1.schedule();
         return null;
     }
     Runnable stopFlyWheel(){
-        //FlyWheel.INSTANCE.off.schedule();
-        //FlyWheel.INSTANCE.off1.schedule();
-        leftFlyWheel.setPower(0);
-        rightFlyWheel.setPower(0);
+        FlyWheel.INSTANCE.off.schedule();
+        FlyWheel.INSTANCE.off1.schedule();
         return null;
     }
     public void lockOn(){
