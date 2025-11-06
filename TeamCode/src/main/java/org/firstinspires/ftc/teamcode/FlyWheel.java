@@ -44,10 +44,10 @@ public class FlyWheel implements Subsystem {
             .build();
 
     public final Command off = new RunToVelocity(leftFlyWheelControl, 0.0).requires(this).named("FlywheelOff");
-    public final Command on = new RunToVelocity(leftFlyWheelControl, 1100).requires(this).named("FlywheelOff");
+    public final Command on = new RunToVelocity(leftFlyWheelControl, 1200).requires(this).named("FlywheelOff");
 
     public final Command off1 = new RunToVelocity(rightFlyWheelControl, 0.0).requires(this).named("FlywheelOff");
-    public final Command on1 = new RunToVelocity(rightFlyWheelControl, -1100).requires(this).named("FlywheelOff");
+    public final Command on1 = new RunToVelocity(rightFlyWheelControl, -1200).requires(this).named("FlywheelOff");
 
     @Override
     public void initialize() {

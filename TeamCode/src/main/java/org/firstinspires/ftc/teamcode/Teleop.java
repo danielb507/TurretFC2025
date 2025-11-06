@@ -145,10 +145,10 @@ public class Teleop extends NextFTCOpMode {
 
                     if (lastResult != null) {
 
-                        if (lastResult.getTargetXDegrees() < -2) {
+                        if (lastResult.getTargetXDegrees() < 0) {
                             follower().turnDegrees(abs(lastResult.getTargetXDegrees()), true);
                         }
-                        else if (lastResult.getTargetXDegrees() > 2) {
+                        else if (lastResult.getTargetXDegrees() > 0) {
                             follower().turnDegrees(abs(lastResult.getTargetXDegrees()), false);
                         }
                         //telemetry.addData("last tx:",lastResult.getTargetXDegrees());
