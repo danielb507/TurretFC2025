@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-@TeleOp(name = "NextFTC TeleOp Program Java")
+@TeleOp(name = "TeleOp")
 
 public class Teleop extends NextFTCOpMode {
 
@@ -126,12 +126,12 @@ public class Teleop extends NextFTCOpMode {
 
     Runnable runFlyWheel(){
         FlyWheel.INSTANCE.on.schedule();
-        FlyWheel.INSTANCE.on1.schedule();
+        //FlyWheel.INSTANCE.on1.schedule();
         return null;
     }
     Runnable stopFlyWheel(){
         FlyWheel.INSTANCE.off.schedule();
-        FlyWheel.INSTANCE.off1.schedule();
+        //FlyWheel.INSTANCE.off1.schedule();
         return null;
     }
     public void lockOn(){

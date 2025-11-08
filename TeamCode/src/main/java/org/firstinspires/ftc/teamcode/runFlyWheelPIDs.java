@@ -55,7 +55,7 @@ public class runFlyWheelPIDs extends NextFTCOpMode {
     @Override
     public void onUpdate() {
         FlyWheel.INSTANCE.on.schedule();
-        FlyWheel.INSTANCE.on1.schedule();
+        //FlyWheel.INSTANCE.on1.schedule();
         telemetry.update();
     }
 
