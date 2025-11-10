@@ -54,7 +54,7 @@ public class closeBlue extends NextFTCOpMode {
     private final Pose parkPose = new Pose(37,120, Math.toRadians(-52));
     private final Pose launchPose2 = new Pose(34, 97, Math.toRadians(-52));
     private final Pose pickUpPose = new Pose(44, 83, Math.toRadians(180));
-    private final Pose pickUp = new Pose(18, 83, Math.toRadians(180));
+    private final Pose pickUp = new Pose(22, 83, Math.toRadians(180));
 
     public PathChain launchPath, parkPath, pickUpBalls, launchPath2;
 
@@ -81,7 +81,7 @@ public class closeBlue extends NextFTCOpMode {
     }
 
     public Command launchBall = new SetPosition(triggerServo, .4);
-    public Command theDownies = new SetPosition(triggerServo, .65);
+    public Command theDownies = new SetPosition(triggerServo, .6);
     public Command rightGateOpen = new SetPosition(rightRelease, 0);
     public Command rightGateClose = new SetPosition(rightRelease, .4);
     public Command leftGateOpen = new SetPosition(leftRelease, .8);
