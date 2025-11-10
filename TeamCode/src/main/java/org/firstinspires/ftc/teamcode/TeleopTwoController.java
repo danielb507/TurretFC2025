@@ -1,42 +1,35 @@
 package org.firstinspires.ftc.teamcode;
 
 import static java.lang.Math.abs;
-
-import dev.nextftc.bindings.BindingManager;
-import dev.nextftc.bindings.Button;
-import dev.nextftc.core.components.BindingsComponent;
-import dev.nextftc.core.components.SubsystemComponent;
-import dev.nextftc.core.units.Angle;
-import dev.nextftc.extensions.pedro.PedroComponent;
-import dev.nextftc.extensions.pedro.PedroDriverControlled;
-import dev.nextftc.extensions.pedro.TurnBy;
-import dev.nextftc.ftc.Gamepads;
-import dev.nextftc.ftc.NextFTCOpMode;
-import dev.nextftc.ftc.components.BulkReadComponent;
-import dev.nextftc.hardware.driving.DriverControlledCommand;
-import dev.nextftc.hardware.impl.CRServoEx;
-import dev.nextftc.hardware.impl.Direction;
-import dev.nextftc.hardware.impl.MotorEx;
-import dev.nextftc.hardware.impl.ServoEx;
+import static dev.nextftc.bindings.Bindings.button;
+import static dev.nextftc.extensions.pedro.PedroComponent.follower;
 
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
-import static dev.nextftc.bindings.Bindings.*;
-import static dev.nextftc.extensions.pedro.PedroComponent.follower;
 
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
-@TeleOp(name = "TeleOp")
+import dev.nextftc.bindings.BindingManager;
+import dev.nextftc.bindings.Button;
+import dev.nextftc.core.components.BindingsComponent;
+import dev.nextftc.core.components.SubsystemComponent;
+import dev.nextftc.extensions.pedro.PedroComponent;
+import dev.nextftc.extensions.pedro.PedroDriverControlled;
+import dev.nextftc.ftc.Gamepads;
+import dev.nextftc.ftc.NextFTCOpMode;
+import dev.nextftc.ftc.components.BulkReadComponent;
+import dev.nextftc.hardware.driving.DriverControlledCommand;
+import dev.nextftc.hardware.impl.CRServoEx;
+import dev.nextftc.hardware.impl.MotorEx;
+import dev.nextftc.hardware.impl.ServoEx;
 
-public class Teleop extends NextFTCOpMode {
+@TeleOp(name = "TeleOpTwoController")
+
+public class TeleopTwoController extends NextFTCOpMode {
 
     CRServoEx intake = new CRServoEx("intake");
     ServoEx leftRelease = new ServoEx("lbar");
@@ -49,15 +42,9 @@ public class Teleop extends NextFTCOpMode {
 
     boolean running = true;
 
-    Button targetButton = button(() -> gamepad1.dpad_down);
-    Button runFlyWheelButton = button(() -> gamepad1.b);
-    Button intakeButton = button(() -> gamepad1.a);
-    Button leftReleaseButton = button(() -> gamepad1.dpad_left);
-    Button rightReleaseButton = button(() -> gamepad1.dpad_right);
-    Button triggerButton = button(() -> gamepad1.y);
-    double timeLastReleasedLeft = 0.0;
-    double timeLastReleasedRight = 0.0;
-
+    Button leftReleaseButton = button(() -> gamepad2.dpad_left);
+    Button rightReleaseButton = button(() -> gamepad2.dpad_right);
+    Button triggerButton = button(() -> gamepad2.y);
 
     DriverControlledCommand driverControlled = new PedroDriverControlled(
             Gamepads.gamepad1().leftStickY().negate(),
@@ -66,7 +53,7 @@ public class Teleop extends NextFTCOpMode {
             false
     );
 
-    public Teleop() {
+    public TeleopTwoController() {
         addComponents(
                 new SubsystemComponent(Turret.INSTANCE),
                 new SubsystemComponent(FlyWheel.INSTANCE),
@@ -88,7 +75,7 @@ public class Teleop extends NextFTCOpMode {
                 .whenTrue(() -> lockOn())
                 .whenBecomesFalse(() -> lockOff());
 
-        button(() -> gamepad1.b)
+        button(() -> gamepad2.b)
                 .toggleOnBecomesTrue()
                 .whenBecomesTrue(() -> runFlyWheel())
                 .whenBecomesFalse(() -> stopFlyWheel());
@@ -136,7 +123,7 @@ public class Teleop extends NextFTCOpMode {
         return null;
     }
     public void lockOn(){
-            LLResult result = Teleop.limelight.getLatestResult();
+            LLResult result = TeleopTwoController.limelight.getLatestResult();
             if (result != null) {
 
                 if (result.isValid()) {

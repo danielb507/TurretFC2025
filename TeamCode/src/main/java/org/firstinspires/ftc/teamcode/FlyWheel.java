@@ -60,6 +60,7 @@ public class FlyWheel implements Subsystem {
 
     public final Command autoOff = new RunToVelocity(FlyWheelControl, 0.0).requires(this).named("FlywheelOff");
     public final Command autoOn = new RunToVelocity(FlyWheelControl, 1100).requires(this).named("FlywheelOff");
+    private boolean isStarted = false;
 
     @Override
     public void initialize() {
@@ -74,7 +75,6 @@ public class FlyWheel implements Subsystem {
 
         telemetryManager.getTelemetry().update();
         manager.update();
-
 
         leftFlyWheel.setPower(FlyWheelControl.calculate(leftFlyWheel.getState()));
         rightFlyWheel.setPower(FlyWheelControl.calculate(new KineticState(rightFlyWheel.getCurrentPosition(), abs(rightFlyWheel.getVelocity()))));

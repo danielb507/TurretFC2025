@@ -55,10 +55,16 @@ public class farRed extends NextFTCOpMode {
             .mirror();
     private final Pose launchPose = new Pose(37, 95, Math.toRadians(-52))
             .mirror();
+    private final Pose launchPose2 = new Pose(34, 97, Math.toRadians(-52))
+            .mirror();
+    private final Pose pickUpPose = new Pose(44, 83, Math.toRadians(180))
+            .mirror();
+    private final Pose pickUp = new Pose(18, 83, Math.toRadians(180))
+            .mirror();
     private final Pose parkPose = new Pose(37,70, Math.toRadians(-52))
             .mirror();
 
-    public PathChain driveForward, launchPath, parkPath;
+    public PathChain driveForward, launchPath, parkPath, pickUpBalls, launchPath2;
 
     public void buildPaths() {
 
@@ -74,10 +80,20 @@ public class farRed extends NextFTCOpMode {
                 .addPath(new BezierLine(launchPose, parkPose))
                 .setLinearHeadingInterpolation(launchPose.getHeading(), parkPose.getHeading())
                 .build();
+        pickUpBalls = follower().pathBuilder()
+                .addPath(new BezierLine(launchPose, pickUpPose))
+                .setLinearHeadingInterpolation(launchPose.getHeading(), pickUpPose.getHeading())
+                .addPath(new BezierLine(pickUpPose, pickUp))
+                .setLinearHeadingInterpolation(pickUpPose.getHeading(), pickUp.getHeading())
+                .build();
+        launchPath2 = follower().pathBuilder()
+                .addPath(new BezierLine(pickUp, launchPose2))
+                .setLinearHeadingInterpolation(pickUp.getHeading(), launchPose2.getHeading())
+                .build();
     }
 
     public Command launchBall = new SetPosition(triggerServo, .4);
-    public Command theDownies = new SetPosition(triggerServo, .7);
+    public Command theDownies = new SetPosition(triggerServo, .65);
     public Command rightGateOpen = new SetPosition(rightRelease, 0);
     public Command rightGateClose = new SetPosition(rightRelease, .4);
     public Command leftGateOpen = new SetPosition(leftRelease, .8);
@@ -99,7 +115,7 @@ public class farRed extends NextFTCOpMode {
         limelight.setPollRateHz(100); // This sets how often we ask Limelight for data (100 times per second)
         limelight.start(); // This tells Limelight to start looking!
         limelight.pipelineSwitch(0); // Switch to pipeline number 0
-
+        FlyWheel.INSTANCE.off.schedule();
         buildPaths();
         follower().setStartingPose(startPose);
     }
@@ -126,6 +142,21 @@ public class farRed extends NextFTCOpMode {
                         launchBall,
                         new Delay(.5),
                         theDownies, //Henry don't hate us please
+                        //new FollowPath(parkPath)
+                        new ParallelGroup(
+                                rightGateClose,
+                                leftGateClose
+                        ),
+                        new FollowPath(pickUpBalls, true, .5),
+                        new Delay(1),
+                        new FollowPath(launchPath2),
+                        launchBall,
+                        new Delay(.5),
+                        theDownies,
+                        new Delay(2),
+                        launchBall,
+                        new Delay(.5),
+                        theDownies,
                         new FollowPath(parkPath)
                 )
         );
@@ -134,11 +165,6 @@ public class farRed extends NextFTCOpMode {
     @Override
     public void onStartButtonPressed() {
         autonomousRoutine().schedule();
-        //follower().followPath(launchPath);
-        //FlyWheel.INSTANCE.launchOn(1500);
-        //triggerServo.setPosition(.4);
-        //sleep(500);
-        //triggerServo.setPosition(.7);
     }
 
 
