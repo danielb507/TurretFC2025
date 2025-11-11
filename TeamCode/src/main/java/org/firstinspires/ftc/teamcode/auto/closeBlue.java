@@ -51,7 +51,7 @@ public class closeBlue extends NextFTCOpMode {
 
     private final Pose startPose = new Pose(22, 123, Math.toRadians(144));
     private final Pose launchPose = new Pose(37, 95, Math.toRadians(-52));
-    private final Pose parkPose = new Pose(37,120, Math.toRadians(-52));
+    private final Pose parkPose = new Pose(37,120, Math.toRadians(180));
     private final Pose launchPose2 = new Pose(34, 97, Math.toRadians(-52));
     private final Pose pickUpPose = new Pose(44, 83, Math.toRadians(180));
     private final Pose pickUp = new Pose(22, 83, Math.toRadians(180));

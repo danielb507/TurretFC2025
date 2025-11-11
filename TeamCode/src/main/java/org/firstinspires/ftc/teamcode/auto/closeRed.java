@@ -53,7 +53,7 @@ public class closeRed extends NextFTCOpMode {
             .mirror();
     private final Pose launchPose = new Pose(37, 95, Math.toRadians(-45))
             .mirror();
-    private final Pose parkPose = new Pose(37,120, Math.toRadians(-48))
+    private final Pose parkPose = new Pose(37,120, Math.toRadians(180))
             .mirror();
     private final Pose launchPose2 = new Pose(34, 97, Math.toRadians(-45))
             .mirror();

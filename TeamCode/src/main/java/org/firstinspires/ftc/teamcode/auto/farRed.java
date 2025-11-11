@@ -61,7 +61,7 @@ public class farRed extends NextFTCOpMode {
             .mirror();
     private final Pose pickUp = new Pose(20, 83, Math.toRadians(180))
             .mirror();
-    private final Pose parkPose = new Pose(37,70, Math.toRadians(-52))
+    private final Pose parkPose = new Pose(37,70, Math.toRadians(180))
             .mirror();
 
     public PathChain driveForward, launchPath, parkPath, pickUpBalls, launchPath2;

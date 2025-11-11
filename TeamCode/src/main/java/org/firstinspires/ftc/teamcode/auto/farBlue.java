@@ -56,7 +56,7 @@ public class farBlue extends NextFTCOpMode {
     private final Pose launchPose2 = new Pose(34, 97, Math.toRadians(-52));
     private final Pose pickUpPose = new Pose(44, 83, Math.toRadians(180));
     private final Pose pickUp = new Pose(18, 83, Math.toRadians(180));
-    private final Pose parkPose = new Pose(37,70, Math.toRadians(-52));
+    private final Pose parkPose = new Pose(37,70, Math.toRadians(180));
 
     public PathChain driveForward, launchPath, parkPath, pickUpBalls, launchPath2;
 
