@@ -19,13 +19,18 @@ import dev.nextftc.hardware.impl.Direction;
 import dev.nextftc.hardware.impl.MotorEx;
 import dev.nextftc.hardware.impl.ServoEx;
 
+import com.pedropathing.ftc.localization.localizers.PinpointLocalizer;
+import com.pedropathing.geometry.Pose;
+import com.pedropathing.localization.Localizer;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
+import com.qualcomm.hardware.sparkfun.SparkFunOTOS;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import static dev.nextftc.bindings.Bindings.*;
 import static dev.nextftc.extensions.pedro.PedroComponent.follower;
@@ -52,8 +57,8 @@ public class Teleop extends NextFTCOpMode {
     Button targetButton = button(() -> gamepad1.dpad_down);
     Button runFlyWheelButton = button(() -> gamepad1.b);
     Button intakeButton = button(() -> gamepad1.a);
-    Button leftReleaseButton = button(() -> gamepad1.dpad_left);
-    Button rightReleaseButton = button(() -> gamepad1.dpad_right);
+    Button leftReleaseButton = button(() -> gamepad1.dpad_right);
+    Button rightReleaseButton = button(() -> gamepad1.dpad_left);
     Button triggerButton = button(() -> gamepad1.y);
     double timeLastReleasedLeft = 0.0;
     double timeLastReleasedRight = 0.0;
@@ -76,7 +81,6 @@ public class Teleop extends NextFTCOpMode {
 
         );
     }
-//finsihee
 
 
     @Override
@@ -102,6 +106,8 @@ public class Teleop extends NextFTCOpMode {
                 .toggleOnBecomesTrue()
                 .whenBecomesTrue(() -> intake.setPower(-1))
                 .whenBecomesFalse(() -> intake.setPower(0));
+        button(() -> gamepad1.a)
+                .whenBecomesTrue(() -> follower().setPose(new Pose(0, 0,0)));
     }
 
     @Override

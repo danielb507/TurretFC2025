@@ -4,6 +4,7 @@ import static java.lang.Math.abs;
 import static dev.nextftc.bindings.Bindings.button;
 import static dev.nextftc.extensions.pedro.PedroComponent.follower;
 
+import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
@@ -42,8 +43,8 @@ public class TeleopTwoController extends NextFTCOpMode {
 
     boolean running = true;
 
-    Button leftReleaseButton = button(() -> gamepad2.dpad_left);
-    Button rightReleaseButton = button(() -> gamepad2.dpad_right);
+    Button leftReleaseButton = button(() -> gamepad2.dpad_right);
+    Button rightReleaseButton = button(() -> gamepad2.dpad_left);
     Button triggerButton = button(() -> gamepad2.y);
 
     DriverControlledCommand driverControlled = new PedroDriverControlled(
@@ -89,6 +90,8 @@ public class TeleopTwoController extends NextFTCOpMode {
                 .toggleOnBecomesTrue()
                 .whenBecomesTrue(() -> intake.setPower(-1))
                 .whenBecomesFalse(() -> intake.setPower(0));
+        button(() -> gamepad1.a)
+                .whenBecomesTrue(() -> follower().setPose(new Pose(0, 0,0)));
     }
 
     @Override
