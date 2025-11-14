@@ -1,6 +1,9 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.auto;
 
+import org.firstinspires.ftc.teamcode.Turret;
+import org.firstinspires.ftc.teamcode.FlyWheel;
 import static java.lang.Math.abs;
+
 
 import dev.nextftc.core.commands.Command;
 import dev.nextftc.core.commands.delays.Delay;
@@ -57,12 +60,17 @@ public class closeRed extends NextFTCOpMode {
             .mirror();
     private final Pose launchPose2 = new Pose(34, 97, Math.toRadians(-45))
             .mirror();
-    private final Pose pickUpPose = new Pose(44, 83, Math.toRadians(180))
+    private final Pose pickUpPose = new Pose(46, 81, Math.toRadians(180))
             .mirror();
-    private final Pose pickUp = new Pose(22, 83, Math.toRadians(180))
+    private final Pose pickUp = new Pose(22, 81, Math.toRadians(180))
             .mirror();
-
-    public PathChain launchPath, parkPath, pickUpBalls, launchPath2;
+    private final Pose pickUpPose2 = new Pose(44, 57, Math.toRadians(180))
+            .mirror();
+    private final Pose pickUp2 = new Pose(15, 57, Math.toRadians(180))
+            .mirror();
+    private final Pose midpoint = new Pose(30, 57, Math.toRadians(180))
+            .mirror();
+    public PathChain launchPath, parkPath, pickUpBalls, launchPath2, pickUpBalls2, launchPath3;
 
     public void buildPaths() {
 
@@ -83,6 +91,18 @@ public class closeRed extends NextFTCOpMode {
         launchPath2 = follower().pathBuilder()
                 .addPath(new BezierLine(pickUp, launchPose2))
                 .setLinearHeadingInterpolation(pickUp.getHeading(), launchPose2.getHeading())
+                .build();
+        pickUpBalls2 = follower().pathBuilder()
+                .addPath(new BezierLine(launchPose2, pickUpPose2))
+                .setLinearHeadingInterpolation(launchPose2.getHeading(), pickUpPose2.getHeading())
+                .addPath(new BezierLine(pickUpPose2, pickUp2))
+                .setLinearHeadingInterpolation(pickUpPose2.getHeading(), pickUp2.getHeading())
+                .build();
+        launchPath3 = follower().pathBuilder()
+                .addPath(new BezierLine(pickUp2, midpoint))
+                .setLinearHeadingInterpolation(pickUp2.getHeading(), midpoint.getHeading())
+                .addPath(new BezierLine(midpoint, launchPose2))
+                .setLinearHeadingInterpolation(midpoint.getHeading(), launchPose2.getHeading())
                 .build();
     }
 
@@ -126,12 +146,12 @@ public class closeRed extends NextFTCOpMode {
                         runIntake,
                         theDownies, //Henry don't hate us please
                         rightGateOpen,
-                        new Delay(3),
+                        new Delay(2),
                         launchBall,
                         new Delay(.5),
                         theDownies, //Henry don't hate us please
                         leftGateOpen,
-                        new Delay(3),
+                        new Delay(2),
                         launchBall,
                         new Delay(.5),
                         theDownies, //Henry don't hate us please
@@ -140,9 +160,20 @@ public class closeRed extends NextFTCOpMode {
                                 rightGateClose,
                                 leftGateClose
                         ),
-                        new FollowPath(pickUpBalls, true, .5),
+                        new FollowPath(pickUpBalls, true, .7),
                         new Delay(1),
                         new FollowPath(launchPath2),
+                        new Delay(.5),
+                        launchBall,
+                        new Delay(.5),
+                        theDownies,
+                        new Delay(2),
+                        launchBall,
+                        new Delay(.5),
+                        theDownies,
+                        new FollowPath(pickUpBalls2, true, .7),
+                        new FollowPath(launchPath3),
+                        new Delay(.5),
                         launchBall,
                         new Delay(.5),
                         theDownies,
